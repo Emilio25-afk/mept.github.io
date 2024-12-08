@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido a MEPT</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            height: 100%;
+        }
+        .left-side {
+        flex: 1;
+        background-image: url('https://i.pinimg.com/736x/1b/ee/92/1bee925e0561656197a708e289b919c9.jpg');
+        background-repeat: no-repeat; /* Evita que la imagen se repita */
+        background-size: 100% auto; /* La imagen será el 50% del ancho del contenedor y ajustará su altura automáticamente */
+        background-position: center;
+        background-color: #000; /* Fondo de respaldo en caso de que la imagen no cargue */
+        }
+
+        .right-side {
+            flex: 1;
+            background-color: black;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+        h1 {
+            font-family: monospace;
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .mascot {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #FFD700;
+            overflow: hidden;
+            margin: 20px auto;
+        }
+        .mascot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .buttons {
+            margin-top: 20px;
+        }
+        .btn {
+            background-color: #90EE90;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #7CFC00;
+        }
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .left-side {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-side"></div>
+        <div class="right-side">
+            <h1>¡BIENVENIDO<br>A MEPT!</h1>
+            <div class="mascot">
+                <img src="https://cdn.myportfolio.com/17be4dd08c5417027a544816a909fcf8/5ef8a1fe-4574-4c36-8ef7-e60c9cc89ae6_rw_1200.png?h=bd8bf71a6b5d0434f11d202f355b6807" alt="Mascota MEPT">
+            </div>
+            <p>¿Eres profesor o alumno?</p>
+            <div class="buttons">
+                <button class="btn" onclick="window.location.href='Teacher.html';">Profesor</button>
+                <button class="btn" onclick="window.location.href='Studient.html';">Alumno</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

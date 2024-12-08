@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrativo</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #000;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #751c24;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: white;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .class-form {
+            display: none;
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .class-form input[type="text"],
+        .class-form input[type="file"] {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .class-list, .activity-list {
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .class-item, .activity-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .class-item button, .activity-item button {
+            padding: 5px 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            loadClasses();
+            loadStudentActivities();
+        });
+
+        function toggleForm() {
+            const form = document.querySelector('.class-form');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function addClass() {
+            const className = document.querySelector('#class-name').value;
+            const fileInput = document.querySelector('#class-file');
+            const file = fileInput.files[0];
+
+            if (!className || !file) {
+                alert("Por favor, llena todos los campos.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const classData = {
+                    name: className,
+                    file: e.target.result,
+                    fileName: file.name
+                };
+
+                saveClass(classData);
+                addClassToDOM(classData);
+
+                document.querySelector('#class-name').value = '';
+                fileInput.value = '';
+                toggleForm();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function saveClass(classData) {
+            let classes = JSON.parse(localStorage.getItem('classes')) || [];
+            classes.push(classData);
+            localStorage.setItem('classes', JSON.stringify(classes));
+        }
+
+        function loadClasses() {
+            const classes = JSON.parse(localStorage.getItem('classes')) || [];
+            const classList = document.querySelector('.class-list');
+            classList.innerHTML = '';
+
+            if (classes.length === 0) {
+                classList.innerHTML = '<p>No hay clases disponibles.</p>';
+                return;
+            }
+
+            classes.forEach(classData => addClassToDOM(classData));
+        }
+
+        function addClassToDOM(classData) {
+            const classList = document.querySelector('.class-list');
+            const classItem = document.createElement('div');
+            classItem.classList.add('class-item');
+
+            classItem.innerHTML = `
+                <span>${classData.name} (${classData.fileName})</span>
+                <div>
+                    <button onclick="deleteClass('${classData.name}')">Eliminar</button>
+                </div>
+            `;
+
+            classList.appendChild(classItem);
+        }
+
+        function deleteClass(className) {
+            let classes = JSON.parse(localStorage.getItem('classes')) || [];
+            classes = classes.filter(cls => cls.name !== className);
+            localStorage.setItem('classes', JSON.stringify(classes));
+            loadClasses();
+        }
+
+        function loadStudentActivities() {
+            const activities = JSON.parse(localStorage.getItem('activities')) || [];
+            const activityList = document.querySelector('.activity-list');
+            activityList.innerHTML = '';
+
+            if (activities.length === 0) {
+                activityList.innerHTML = '<p>No hay actividades enviadas.</p>';
+                return;
+            }
+
+            activities.forEach(activity => addActivityToDOM(activity));
+        }
+
+        function addActivityToDOM(activity) {
+            const activityList = document.querySelector('.activity-list');
+            const activityItem = document.createElement('div');
+            activityItem.classList.add('activity-item');
+
+            activityItem.innerHTML = `
+                <div>
+                    <p><strong>${activity.student}</strong> subió: ${activity.fileName}</p>
+                    <p>Comentario: ${activity.comment}</p>
+                </div>
+                <button onclick="viewFile('${activity.file}', '${activity.fileName}')">Ver Archivo</button>
+            `;
+
+            activityList.appendChild(activityItem);
+        }
+
+        function viewFile(file, fileName) {
+            const link = document.createElement('a');
+            link.href = file;
+            link.download = fileName;
+            link.target = '_blank';
+            link.click();
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Panel Administrativo</h1>
+        <div class="actions">
+            <button onclick="toggleForm()">Agregar Clase</button>
+        </div>
+
+        <div class="class-form">
+            <h2>Agregar Clase</h2>
+            <input type="text" id="class-name" placeholder="Nombre de la clase">
+            <input type="file" id="class-file" accept=".pdf,.doc,.pptx">
+            <button onclick="addClass()">Guardar Clase</button>
+        </div>
+
+        <div class="class-list">
+            <h2>Lista de Clases</h2>
+        </div>
+
+        <div class="activity-list">
+            <h2>Actividades de Estudiantes</h2>
+        </div>
+    </div>
+</body>
+</html>

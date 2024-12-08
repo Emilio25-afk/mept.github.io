@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Estudiante</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .left-section {
+            flex: 1;
+            background-image: url('https://i.pinimg.com/736x/1b/ee/92/1bee925e0561656197a708e289b919c9.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center;
+            background-color: #000;
+        }
+
+        .right-section {
+            flex: 1;
+            background-color: #000;
+            color: white;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            font-family: 'Courier New', monospace;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 4px;
+            background-color: #f3f3f3;
+        }
+
+        button {
+            cursor: pointer;
+            padding: 0.75rem 1.5rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-button:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .left-section {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="left-section" role="img" aria-label="Laboratorio de computación con computadoras y sillas rojas"></div>
+    <div class="right-section">
+        <button class="back-button" onclick="history.back()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Atrás
+        </button>
+        <h1>Estudiante</h1>
+        <form id="estudianteForm" novalidate>
+            <div class="form-group">
+                <label for="nombres">Nombres</label>
+                <input type="text" id="nombres" name="nombres" required>
+            </div>
+            <div class="form-group">
+                <label for="codigo">Código</label>
+                <input type="text" id="codigo" name="codigo" required>
+            </div>
+            <button type="submit">Registrar</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('estudianteForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const nombres = document.getElementById('nombres').value.trim();
+            const codigo = document.getElementById('codigo').value.trim();
+
+            if (!nombres || !codigo) {
+                alert('Por favor, complete todos los campos.');
+                return;
+            }
+
+            // Obtener estudiantes desde localStorage
+            let estudiantes = JSON.parse(localStorage.getItem('estudiantes')) || [];
+
+            // Añadir nuevo estudiante
+            estudiantes.push({ nombres, codigo });
+
+            // Guardar en localStorage
+            localStorage.setItem('estudiantes', JSON.stringify(estudiantes));
+
+            alert('Estudiante registrado con éxito.');
+            document.getElementById('estudianteForm').reset();
+        });
+    </script>
+</body>
+</html>

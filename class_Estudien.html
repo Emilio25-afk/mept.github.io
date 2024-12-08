@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Estudiante</title>
+    <style>
+        :root {
+            --primary-color: #751c24;
+            --secondary-color: #007bff;
+            --background-color: #000;
+            --text-color: #fff;
+            --hover-color: #0056b3;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--primary-color);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .user-info {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+
+        .section {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        button, input[type="file"], textarea {
+            padding: 10px;
+            border-radius: 4px;
+            border: none;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        button {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: var(--hover-color);
+        }
+
+        input[type="file"] {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            resize: vertical;
+            min-height: 100px;
+            margin-bottom: 10px;
+        }
+
+        #file-viewer {
+            width: 100%;
+            height: 500px;
+            border: none;
+            border-radius: 8px;
+            background-color: #1e1e1e;
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+
+            .item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .item button {
+                margin-top: 10px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Panel del Estudiante</h1>
+        <div class="user-info">
+            <h2>Bienvenido, <span id="studentName"></span></h2>
+        </div>
+        <section id="class-list" class="section">
+            <h2>Clases Disponibles</h2>
+            <div id="classes-container"></div>
+        </section>
+        <section id="submit-activity" class="section">
+            <h2>Enviar Evidencia</h2>
+            <form id="activity-form">
+                <input type="file" id="activity-file" accept=".png,.pdf,.doc,.docx,.ppt,.pptx" required>
+                <textarea id="activity-comment" placeholder="Escribe un comentario sobre tu evidencia" required></textarea>
+                <button type="submit">Enviar</button>
+            </form>
+        </section>
+        <section id="activity-list" class="section">
+            <h2>Mis Evidencias Enviadas</h2>
+            <div id="activities-container"></div>
+        </section>
+        <iframe id="file-viewer" class="hidden"></iframe>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const studentName = localStorage.getItem("studentName") || "Estudiante";
+            document.getElementById("studentName").textContent = studentName;
+
+            loadClasses();
+            loadActivities();
+
+            document.getElementById('activity-form').addEventListener('submit', submitActivity);
+        });
+
+        function loadClasses() {
+            const classes = JSON.parse(localStorage.getItem("classes")) || [];
+            const classesContainer = document.getElementById('classes-container');
+
+            if (classes.length === 0) {
+                classesContainer.innerHTML = '<p>No hay clases disponibles en este momento.</p>';
+                return;
+            }
+
+            classesContainer.innerHTML = classes.map(classData => `
+                <div class="item">
+                    <span>${classData.name} (${classData.fileName})</span>
+                    <button onclick="viewFile('${classData.file}')">Ver</button>
+                </div>
+            `).join('');
+        }
+
+        function submitActivity(event) {
+            event.preventDefault();
+            const activityFile = document.getElementById('activity-file').files[0];
+            const activityComment = document.getElementById('activity-comment').value;
+
+            if (!activityFile || !activityComment.trim()) {
+                alert("Por favor, sube un archivo y escribe un comentario.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const activityData = {
+                    student: localStorage.getItem("studentName") || "Estudiante",
+                    file: e.target.result,
+                    fileName: activityFile.name,
+                    comment: activityComment,
+                    date: new Date().toLocaleString()
+                };
+
+                saveActivity(activityData);
+
+                document.getElementById('activity-file').value = '';
+                document.getElementById('activity-comment').value = '';
+                loadActivities();
+            };
+            reader.readAsDataURL(activityFile);
+        }
+
+        function saveActivity(activityData) {
+            let activities = JSON.parse(localStorage.getItem('activities')) || [];
+            activities.push(activityData);
+            localStorage.setItem('activities', JSON.stringify(activities));
+        }
+
+        function loadActivities() {
+            const activities = JSON.parse(localStorage.getItem('activities')) || [];
+            const activitiesContainer = document.getElementById('activities-container');
+
+            if (activities.length === 0) {
+                activitiesContainer.innerHTML = '<p>No hay actividades enviadas aún.</p>';
+                return;
+            }
+
+            activitiesContainer.innerHTML = activities.map(activity => `
+                <div class="item">
+                    <div>
+                        <p><strong>${activity.student}</strong> subió: ${activity.fileName}</p>
+                        <p>Comentario: ${activity.comment}</p>
+                        <p>Fecha: ${activity.date}</p>
+                    </div>
+                    <button onclick="viewFile('${activity.file}')">Ver Archivo</button>
+                </div>
+            `).join('');
+        }
+
+        function viewFile(file) {
+            const viewer = document.getElementById('file-viewer');
+            viewer.src = file;
+            viewer.classList.remove('hidden');
+            viewer.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

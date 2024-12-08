@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Estudiantes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Estudiantes</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombres</th>
+                <th>Código</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-estudiantes"></tbody>
+    </table>
+    <script>
+        // Cargar estudiantes desde localStorage
+        const estudiantes = JSON.parse(localStorage.getItem('estudiantes')) || [];
+        const tabla = document.getElementById('tabla-estudiantes');
+
+        estudiantes.forEach(est => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `<td>${est.nombres}</td><td>${est.codigo}</td>`;
+            tabla.appendChild(fila);
+        });
+    </script>
+</body>
+</html>
